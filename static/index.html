@@ -1,0 +1,654 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Credit Letter & Inquiry Quality Checker · Quality Checker</title>
+    <link rel="stylesheet" href="/style.css" />
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <svg class="icon-definitions" aria-hidden="true">
+      <defs>
+        <symbol id="i-shield" viewBox="0 0 24 24">
+          <path d="M12 3 4 6v6c0 5 8 9 8 9s8-4 8-9V6zM8 12l3 3 5-6" />
+        </symbol>
+        <symbol id="i-home" viewBox="0 0 24 24">
+          <path d="m3 10 9-7 9 7M5 9v12h14V9M9 21v-8h6v8" />
+        </symbol>
+        <symbol id="i-file" viewBox="0 0 24 24">
+          <path d="M14 3H5v18h14V8zM14 3v5h5M8 12h8M8 16h6" />
+        </symbol>
+        <symbol id="i-search" viewBox="0 0 24 24">
+          <circle cx="10" cy="10" r="6" />
+          <path d="m15 15 6 6" />
+        </symbol>
+        <symbol id="i-check" viewBox="0 0 24 24">
+          <path d="m5 12 4 4L19 6" />
+        </symbol>
+        <symbol id="i-upload" viewBox="0 0 24 24">
+          <path d="M12 16V3m-5 5 5-5 5 5M4 15v6h16v-6" />
+        </symbol>
+        <symbol id="i-clock" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 7v5l3 2" />
+        </symbol>
+        <symbol id="i-layers" viewBox="0 0 24 24">
+          <path d="m3 7 9-5 9 5-9 5zM3 12l9 5 9-5M3 17l9 5 9-5" />
+        </symbol>
+        <symbol id="i-settings" viewBox="0 0 24 24">
+          <path
+            d="m9 3-1 3-3 1-2 3 2 2-1 4 3 2 3-1 2 3h3l1-3 3-1 2-3-2-2 1-4-3-2-3 1-2-3z"
+          />
+          <circle cx="12" cy="12" r="3" />
+        </symbol>
+        <symbol id="i-alert" viewBox="0 0 24 24">
+          <path d="m12 3 10 18H2zM12 9v5M12 17v1" />
+        </symbol>
+        <symbol id="i-filter" viewBox="0 0 24 24">
+          <path d="M3 5h18l-7 8v6l-4 2v-8z" />
+        </symbol>
+        <symbol id="i-close" viewBox="0 0 24 24">
+          <path d="m6 6 12 12M6 18 18 6" />
+        </symbol>
+      </defs>
+    </svg>
+    <aside class="sidebar">
+      <a class="brand" href="#workspace"
+        ><span class="brand-icon"
+          ><svg class="icon"><use href="#i-shield" /></svg></span
+        >Quality Checker</a
+      >
+      <div class="nav-label">WORKSPACE</div>
+      <nav aria-label="Main navigation">
+        <button class="nav-item" data-target="overview" title="Dashboard">
+          <svg class="icon"><use href="#i-home" /></svg>Dashboard</button
+        ><button
+          class="nav-item active"
+          data-target="uploads"
+          title="New Check"
+        >
+          <svg class="icon"><use href="#i-search" /></svg>New Check</button
+        ><button
+          class="nav-item"
+          data-target="letter-panel"
+          title="Letter Review"
+        >
+          <svg class="icon"><use href="#i-file" /></svg>Letter Review</button
+        ><button
+          class="nav-item"
+          data-target="inquiry-panel"
+          title="Inquiry Review"
+        >
+          <svg class="icon"><use href="#i-search" /></svg>Inquiry Review</button
+        ><button class="nav-item" data-target="qa-panel" title="Review Queue">
+          <svg class="icon"><use href="#i-layers" /></svg>Review Queue<span
+            class="nav-count"
+            id="queue-count"
+            >0</span
+          ></button
+        ><button
+          class="nav-item"
+          data-target="source-panel"
+          title="Source Report"
+        >
+          <svg class="icon"><use href="#i-file" /></svg>Source Report</button
+        ><button class="nav-item" id="settings-nav" title="Settings">
+          <svg class="icon"><use href="#i-settings" /></svg>Settings
+        </button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="protection-title">
+          <svg class="icon"><use href="#i-shield" /></svg>Protection always on
+        </div>
+        <p>Every inquiry. Every bureau.<br />Evidence before approval.</p>
+        <div class="progress-track"><span id="protection-progress"></span></div>
+        <span id="protection-count">Ready for your first check</span>
+      </div>
+      <div class="sidebar-footer">CREDIT QUALITY WORKSPACE</div>
+    </aside>
+    <div class="workspace" id="workspace">
+      <header class="topbar">
+        <div>
+          <div class="title-line">
+            <h1>Credit Letter & Inquiry Quality Checker</h1>
+            <span class="pill review-pill">Review Mode</span>
+          </div>
+          <p>
+            Analyze dispute letters and credit inquiries for accuracy and
+            positive account protection.
+          </p>
+        </div>
+        <div class="header-tools">
+          <label class="search"
+            ><svg class="icon"><use href="#i-search" /></svg
+            ><input
+              id="search"
+              aria-label="Search inquiries"
+              placeholder="Search inquiries or accounts…" /></label
+          ><button class="profile" id="access-button">
+            <span class="avatar" id="avatar">QA</span
+            ><span
+              ><strong id="user-name">Your workspace</strong
+              ><small id="user-role">Connect to review</small></span
+            ><span>⌄</span>
+          </button>
+        </div>
+      </header>
+      <main>
+        <div
+          id="notice"
+          class="notice"
+          role="status"
+          aria-live="polite"
+          hidden
+        ></div>
+        <section
+          class="upload-section"
+          id="uploads"
+          aria-label="Document uploads"
+        >
+          <div class="upload-heading">
+            <div>
+              <h2>Start a quality check</h2>
+              <p>
+                Upload the source documents and the letter you want to verify.
+              </p>
+            </div>
+            <div class="check-controls">
+              <label
+                >Check ID
+                <input
+                  id="report-id"
+                  value="new-check"
+                  aria-label="Check ID" /></label
+              ><button class="text-button" id="example">Try example</button>
+            </div>
+          </div>
+          <div class="upload-row">
+            <label class="upload-zone" id="source-drop"
+              ><input
+                id="source-file"
+                type="file"
+                accept=".pdf,.docx,.txt,.csv,.json"
+              /><span class="upload-icon"
+                ><svg class="icon"><use href="#i-upload" /></svg></span
+              ><span
+                ><strong id="source-file-name">Upload source document</strong
+                ><small id="source-file-status"
+                  >Credit report · PDF, Word, TXT, CSV or JSON</small
+                ></span
+              ><span class="browse">Browse</span></label
+            >
+            <label class="upload-zone" id="letter-drop"
+              ><input
+                id="letter-file"
+                type="file"
+                accept=".pdf,.docx,.txt,.csv"
+              /><span class="upload-icon lavender"
+                ><svg class="icon"><use href="#i-file" /></svg></span
+              ><span
+                ><strong id="letter-file-name">Upload dispute letter</strong
+                ><small id="letter-file-status"
+                  >Letter or schedule · PDF, Word, TXT or CSV</small
+                ></span
+              ><span class="browse">Browse</span></label
+            ><button class="primary run-button" id="run-check">
+              <svg class="icon"><use href="#i-search" /></svg>Run Cross-Check
+            </button>
+          </div>
+          <div class="upload-footnote">
+            <svg class="icon"><use href="#i-shield" /></svg>Original documents
+            are preserved. Extracted entries require verification before
+            approval.<span>10 MB per file</span>
+          </div>
+        </section>
+        <section class="approval-banner" id="approval-banner">
+          <span class="banner-symbol" id="banner-symbol">!</span>
+          <div class="banner-copy">
+            <h2 id="banner-title">Upload your documents to begin.</h2>
+            <p id="banner-description">
+              Positive-account and authorization reviews are required before a
+              letter can be approved.
+            </p>
+          </div>
+          <div class="banner-actions">
+            <button class="danger" id="resolve-issues">
+              <svg class="icon"><use href="#i-check" /></svg>Resolve Issues</button
+            ><button class="approve" id="approve-top" disabled>
+              <svg class="icon"><use href="#i-check" /></svg>Approve after
+              Review
+            </button>
+          </div>
+        </section>
+        <section class="overview" id="overview" aria-label="Screening summary">
+          <div id="summary" class="metrics"></div>
+        </section>
+        <div class="review-grid">
+          <section class="panel letter-panel" id="letter-panel">
+            <div class="panel-heading">
+              <h2>
+                <svg class="icon blue"><use href="#i-file" /></svg>Letter
+                Preview
+              </h2>
+              <div class="panel-tools">
+                <button class="small-button" id="view-original">
+                  View Original</button
+                ><button
+                  class="icon-button"
+                  id="expand-preview"
+                  aria-label="Expand letter preview"
+                >
+                  <svg class="icon"><use href="#i-layers" /></svg>
+                </button>
+              </div>
+            </div>
+            <div class="document-toolbar">
+              <span id="preview-file-name">No letter uploaded</span
+              ><span class="pill neutral" id="preview-label"
+                >Awaiting document</span
+              >
+            </div>
+            <div id="letter-preview" class="letter-paper">
+              <div class="empty-state">
+                <span class="empty-icon"
+                  ><svg class="icon"><use href="#i-file" /></svg
+                ></span>
+                <h3>Your letter, ready for review</h3>
+                <p>
+                  Upload a dispute letter to see its original text and the
+                  entries requiring attention.
+                </p>
+                <button class="small-button" id="upload-letter-shortcut">
+                  Choose a letter
+                </button>
+              </div>
+            </div>
+            <div class="preview-footer">
+              <span id="preview-footer"
+                >Original text is preserved during cross-checking.</span
+              ><button class="text-button" id="edit-extraction" disabled>
+                Review extracted entries →
+              </button>
+            </div>
+          </section>
+          <section class="panel issues-panel" id="issues-panel">
+            <div class="panel-heading">
+              <h2>
+                <svg class="icon red"><use href="#i-alert" /></svg>Issues Found
+              </h2>
+              <span class="pill red-pill" id="issue-count">Not checked</span>
+            </div>
+            <div id="issues-list">
+              <div class="empty-state">
+                <span class="empty-icon"
+                  ><svg class="icon"><use href="#i-shield" /></svg
+                ></span>
+                <h3>Clarity before approval</h3>
+                <p>
+                  Run a cross-check to review protected accounts, transcription
+                  errors, duplicates, and required QA actions.
+                </p>
+              </div>
+            </div>
+            <div class="issues-footer">
+              <span class="status-dot"></span>No unresolved critical issue can
+              be approved.
+            </div>
+          </section>
+        </div>
+        <div class="bottom-grid">
+          <section class="panel" id="inquiry-panel">
+            <div class="panel-heading">
+              <h2>
+                <svg class="icon blue"><use href="#i-search" /></svg>Inquiry
+                Accuracy Checker
+              </h2>
+              <label class="filter-control"
+                ><svg class="icon"><use href="#i-filter" /></svg
+                ><select id="status-filter" aria-label="Filter inquiry status">
+                  <option value="all">All inquiries</option>
+                  <option value="hold">Protection holds</option>
+                  <option value="eligible">QA verified</option>
+                  <option value="unmatched">Authorization review</option>
+                  <option value="duplicates">Duplicates</option>
+                </select></label
+              >
+            </div>
+            <div class="bureau-tabs" role="group" aria-label="Filter by bureau">
+              <button class="tab active" data-bureau="all">
+                All Bureaus <span id="all-count">0</span></button
+              ><button class="tab" data-bureau="TU">TransUnion</button
+              ><button class="tab" data-bureau="EX">Experian</button
+              ><button class="tab" data-bureau="EQ">Equifax</button>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Bureau</th>
+                    <th>Inquiry Name</th>
+                    <th>Date</th>
+                    <th>Positive Account</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="inquiry-rows">
+                  <tr>
+                    <td colspan="6" class="table-empty">
+                      Upload and verify a source report to screen its inquiries.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="table-footer">
+              <span id="table-count">0 inquiries checked</span
+              ><span>Screened against all open and positive accounts.</span>
+            </div>
+          </section>
+          <section class="panel audit-panel">
+            <div class="panel-heading">
+              <h2>
+                <svg class="icon blue"><use href="#i-clock" /></svg>Audit Trail
+              </h2>
+              <button class="small-button" id="refresh-activity">
+                Refresh
+              </button>
+            </div>
+            <div id="activity" class="timeline">
+              <p class="muted">Your check’s saved activity will appear here.</p>
+            </div>
+            <div class="audit-footer">
+              Recorded identities · persistent history
+            </div>
+          </section>
+        </div>
+        <div class="support-grid">
+          <section class="panel" id="source-panel">
+            <div class="panel-heading">
+              <h2>
+                <svg class="icon blue"><use href="#i-file" /></svg>Source Report
+                & Extraction
+              </h2>
+              <button class="small-button" id="reload">
+                Reload saved check
+              </button>
+            </div>
+            <div class="panel-body">
+              <p class="muted">
+                Review the original source and all extracted accounts before
+                using screening results.
+              </p>
+              <button class="secondary" id="review-source" disabled>
+                Review source document
+              </button>
+              <details>
+                <summary>Structured report editor</summary>
+                <label
+                  >Report JSON<textarea
+                    id="report"
+                    rows="8"
+                    placeholder='{"inquiries": [], "accounts": []}'
+                  ></textarea></label
+                ><label class="checkbox-label"
+                  ><input id="manual-source-verified" type="checkbox" />I
+                  verified every inquiry and every open/positive account against
+                  the complete source.</label
+                ><button class="secondary" id="screen">
+                  Save & screen report
+                </button>
+              </details>
+            </div>
+          </section>
+          <section class="panel" id="letter-controls">
+            <div class="panel-heading">
+              <h2>
+                <svg class="icon blue"><use href="#i-check" /></svg>Final Letter
+                Approval
+              </h2>
+              <span class="pill blue-pill">QA only</span>
+            </div>
+            <div class="panel-body">
+              <details>
+                <summary>Verified inquiry schedule</summary>
+                <label
+                  >CSV: bureau,name,date<textarea
+                    id="letter"
+                    rows="5"
+                    placeholder="bureau,name,date"
+                  ></textarea></label
+                ><button class="secondary" id="check-letter">
+                  Cross-check schedule
+                </button>
+              </details>
+              <label class="checkbox-label"
+                ><input id="confirm-letter" type="checkbox" />I reviewed the
+                complete original letter and verified that the inquiry list is
+                complete and accurate.</label
+              ><label
+                >Final approval evidence<textarea
+                  id="approval-evidence"
+                  rows="2"
+                  placeholder="Document your final QA verification…"
+                ></textarea></label
+              ><button class="approve" id="approve-letter" disabled>
+                <svg class="icon"><use href="#i-check" /></svg>Approve final
+                letter
+              </button>
+              <div id="letter-results" class="muted">
+                Run cross-checking before approval.
+              </div>
+            </div>
+          </section>
+        </div>
+        <section class="panel" id="qa-panel">
+          <div class="panel-heading">
+            <h2>
+              <svg class="icon blue"><use href="#i-shield" /></svg>Inquiry QA
+              Review
+            </h2>
+            <span class="pill blue-pill">Evidence required</span>
+          </div>
+          <div class="panel-body">
+            <p id="qa-selection" class="muted">
+              Choose “View details” on an inquiry to review its evidence and
+              document a decision.
+            </p>
+            <div id="qa-evidence"></div>
+            <form id="qa-form" hidden>
+              <div class="form-grid">
+                <label
+                  >Decision<select id="qa-outcome">
+                    <option value="protected">
+                      Confirmed connection — protect
+                    </option>
+                    <option value="eligible">
+                      Documented dispute basis — eligible
+                    </option>
+                  </select></label
+                ><label
+                  >Confirmed positive account<select
+                    id="qa-account"
+                  ></select></label
+                ><label
+                  >Supporting evidence<textarea
+                    id="qa-evidence-text"
+                    required
+                    rows="2"
+                  ></textarea></label
+                ><label
+                  >Authorization / permissible purpose findings<textarea
+                    id="qa-authorization"
+                    required
+                    rows="2"
+                  ></textarea></label
+                ><label
+                  >Application connection findings<textarea
+                    id="qa-application"
+                    required
+                    rows="2"
+                  ></textarea></label
+                ><label
+                  >Date findings<textarea
+                    id="qa-dates"
+                    required
+                    rows="2"
+                  ></textarea></label
+                ><label
+                  >Affiliation / issuer findings<textarea
+                    id="qa-affiliations"
+                    required
+                    rows="2"
+                  ></textarea></label
+                ><label
+                  >Dealership / auto financing findings<textarea
+                    id="qa-auto"
+                    required
+                    rows="2"
+                  ></textarea></label
+                ><label
+                  >Specific factual dispute basis<textarea
+                    id="qa-basis"
+                    rows="2"
+                  ></textarea>
+                </label>
+              </div>
+              <h3>Account-by-account verification</h3>
+              <div id="qa-account-findings" class="form-grid"></div>
+              <h3>Mandatory pre-dispute checks</h3>
+              <div id="qa-checklist" class="checklist-grid"></div>
+              <button type="submit" class="primary">Record QA decision</button>
+            </form>
+          </div>
+        </section>
+        <section class="panel" id="registry-panel">
+          <details class="registry-details">
+            <summary>
+              Creditor relationship registry
+              <span class="pill neutral">Administrator</span>
+            </summary>
+            <p class="muted">
+              No affiliations are invented or preloaded. Document sources and
+              applicable dates before verification.
+            </p>
+            <button class="small-button" id="registry">
+              Load saved relationships
+            </button>
+            <pre id="registry-results"></pre>
+            <label
+              >Relationship record JSON<textarea
+                id="relationship"
+                rows="6"
+              ></textarea></label
+            ><label class="checkbox-label"
+              ><input type="checkbox" id="verify" />Verify this relationship
+              using documented evidence</label
+            ><button class="secondary" id="save-relationship">
+              Save relationship
+            </button>
+          </details>
+        </section>
+        <footer>
+          <svg class="icon"><use href="#i-shield" /></svg>Protect legitimate
+          accounts. Verify authorization. Require documented QA approval.<span
+            >Quality Checker · Quality Checker</span
+          >
+        </footer>
+      </main>
+    </div>
+    <dialog id="access-dialog">
+      <div class="dialog-heading">
+        <div>
+          <h2>Workspace access</h2>
+          <p>Connect using your individual access token.</p>
+        </div>
+        <button
+          class="icon-button"
+          data-close="access-dialog"
+          aria-label="Close settings"
+        >
+          <svg class="icon"><use href="#i-close" /></svg>
+        </button>
+      </div>
+      <label
+        >Access token<input
+          id="token"
+          type="password"
+          autocomplete="off"
+          placeholder="Enter your individual token"
+      /></label>
+      <p class="muted">
+        Your token stays in memory. Agent, QA, and administrator permissions are
+        enforced by the server.
+      </p>
+      <button id="connect" class="primary">Connect to workspace</button>
+      <p id="session" class="muted">No authenticated identity</p>
+    </dialog>
+    <dialog id="intake-dialog" class="intake-dialog">
+      <div class="dialog-heading">
+        <div>
+          <span class="eyebrow">VERIFY DOCUMENT EXTRACTION</span>
+          <h2 id="intake-title">Review extracted entries</h2>
+          <p id="intake-filename"></p>
+        </div>
+        <button
+          class="icon-button"
+          data-close="intake-dialog"
+          aria-label="Close extraction review"
+        >
+          <svg class="icon"><use href="#i-close" /></svg>
+        </button>
+      </div>
+      <div id="intake-notes" class="extraction-notes"></div>
+      <div class="intake-grid">
+        <div>
+          <h3>Original extracted text</h3>
+          <pre id="intake-text" class="source-text"></pre>
+        </div>
+        <div>
+          <h3>
+            Inquiries
+            <button class="small-button" id="add-inquiry">+ Add inquiry</button>
+          </h3>
+          <div id="intake-inquiries" class="editable-records"></div>
+          <div id="intake-account-section">
+            <h3>
+              Open & positive accounts
+              <button class="small-button" id="add-account">
+                + Add account
+              </button>
+            </h3>
+            <div id="intake-accounts" class="editable-records"></div>
+          </div>
+        </div>
+      </div>
+      <label class="checkbox-label"
+        ><input id="intake-confirm" type="checkbox" />I checked the original
+        document and verified all names, dates, bureaus, and the complete
+        inquiry/account lists.</label
+      >
+      <div class="dialog-actions">
+        <span id="intake-error" role="alert"></span
+        ><button class="secondary" data-close="intake-dialog">Cancel</button
+        ><button class="primary" id="apply-extraction">
+          Use verified entries
+        </button>
+      </div>
+    </dialog>
+    <dialog id="preview-dialog" class="preview-dialog">
+      <div class="dialog-heading">
+        <h2>Original letter text</h2>
+        <button
+          class="icon-button"
+          data-close="preview-dialog"
+          aria-label="Close preview"
+        >
+          <svg class="icon"><use href="#i-close" /></svg>
+        </button>
+      </div>
+      <pre id="expanded-text" class="source-text"></pre>
+    </dialog>
+  </body>
+</html>

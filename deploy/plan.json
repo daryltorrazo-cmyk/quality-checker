@@ -1,0 +1,27 @@
+{
+  "project_name": "Quality Checker",
+  "project_id": "quality-checker-511418",
+  "region": "us-central1",
+  "cloud_run_service": "quality-checker",
+  "artifact_registry": "quality-checker-images",
+  "firestore_database": "quality-checker-data",
+  "document_bucket": "quality-checker-511418-documents",
+  "build_bucket": "quality-checker-511418-builds",
+  "runtime_service_account": "quality-checker-runtime",
+  "build_service_account": "quality-checker-build",
+  "identity_secret": "quality-checker-identities",
+  "apis": [
+    "cloudresourcemanager.googleapis.com",
+    "serviceusage.googleapis.com",
+    "run.googleapis.com",
+    "cloudbuild.googleapis.com",
+    "artifactregistry.googleapis.com",
+    "firestore.googleapis.com",
+    "storage.googleapis.com",
+    "secretmanager.googleapis.com",
+    "iam.googleapis.com"
+  ],
+  "access": "private",
+  "github_repository": "daryltorrazo-cmyk/quality-checker",
+  "policy": "create-only; no existing project or resource reuse"
+}
